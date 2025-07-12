@@ -21,6 +21,9 @@ import lombok.Data;
 @Data
 public class ServiceBooking {
 	
+	/*
+	 * service booking entity
+	 */
 	@GeneratedValue(strategy = GenerationType.AUTO)
 
 	@Id
