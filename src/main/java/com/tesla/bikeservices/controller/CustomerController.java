@@ -12,12 +12,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.tesla.bikeservices.entity.Customer;
 import com.tesla.bikeservices.service.CustomerService;
 
 import jakarta.validation.Valid;
-
 @RestController
 @RequestMapping("/api/customers")
 public class CustomerController {
@@ -25,8 +23,9 @@ public class CustomerController {
     private CustomerService customerService;
 	
 	@PostMapping
-    public ResponseEntity<Customer> createCustomer(@Valid @RequestBody Customer customer) {
-        return ResponseEntity.ok(customerService.createCustomer(customer));
+    public ResponseEntity<Customer> createCustomer(@Valid @RequestBody Customer  customer) {
+
+		return ResponseEntity.ok(customerService.createCustomer(customer));
     }
 	
 	@GetMapping("/{id}")
