@@ -3,8 +3,12 @@ package com.tesla.bikeservices.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import com.tesla.bikeservices.dto.ServiceBookingDTO;
 import com.tesla.bikeservices.entity.AppointmentSlot;
 import com.tesla.bikeservices.entity.Customer;
@@ -16,6 +20,7 @@ import com.tesla.bikeservices.repository.CustomerRepository;
 import com.tesla.bikeservices.repository.ServiceBookingRepository;
 import com.tesla.bikeservices.repository.ServiceTypeRepository;
 import com.tesla.bikeservices.repository.SparePartRepository;
+
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -92,6 +97,10 @@ public class ServiceBookingService {
 		return serviceBookingRepository.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException("Booking not found"));
 	}
+	// Search bookings by status, technician, or customer with pagination
+    public Page<ServiceBooking> searchBookingsByCriteria(String status, String technicianPrefix, String customerPrefix, Pageable pageable) {
+        return serviceBookingRepository.findByStatusOrTechnicianOrCustomerNameOrEmail(status, technicianPrefix, customerPrefix, pageable);
+    }
 
 	public List<ServiceBooking> getAllBookings() {
 		return serviceBookingRepository.findAll();

@@ -1,10 +1,10 @@
 package com.tesla.bikeservices.service;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import com.tesla.bikeservices.entity.Customer;
 import com.tesla.bikeservices.repository.CustomerRepository;
 
@@ -40,5 +40,11 @@ public class CustomerService {
 	public void deleteCustomer(Long id) {
         customerRepository.deleteById(id);
     }
+	
+	public Page<Customer> getAllCustomers(String namePrefix, String emailPrefix, String phonePrefix, Pageable pageable) {
+        return customerRepository.findAllCustomersByNameOrEmailOrPhone(namePrefix, emailPrefix, phonePrefix, pageable);
+    }
+	
+	
 	
 }
