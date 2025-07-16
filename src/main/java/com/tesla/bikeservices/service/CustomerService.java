@@ -41,7 +41,7 @@ public class CustomerService {
         customerRepository.deleteById(id);
     }
 	
-	public Page<Customer> getAllCustomers(String namePrefix, String emailPrefix, String phonePrefix, Pageable pageable) {
+	public Page<Customer> findAllCustomersByNameOrEmailOrPhone(String namePrefix, String emailPrefix, String phonePrefix, Pageable pageable) {
         return customerRepository.findAllCustomersByNameOrEmailOrPhone(namePrefix, emailPrefix, phonePrefix, pageable);
     }
 	

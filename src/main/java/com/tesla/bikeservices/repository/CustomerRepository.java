@@ -12,12 +12,12 @@ import com.tesla.bikeservices.entity.Customer;
 @Repository 
 public interface CustomerRepository extends  JpaRepository <Customer, Long> {
 	
-	@Query("SELECT c FROM Customer c WHERE (:namePrefix IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT(:namePrefix, '%'))) " +
-	           "OR (:emailPrefix IS NULL OR LOWER(c.email) LIKE LOWER(CONCAT(:emailPrefix, '%'))) " +
-	           "OR (:phonePrefix IS NULL OR c.phone LIKE CONCAT(:phonePrefix, '%'))")
-	    Page<Customer> findAllCustomersByNameOrEmailOrPhone(@Param("namePrefix") String namePrefix,
-	                                                       @Param("emailPrefix") String emailPrefix,
-	                                                       @Param("phonePrefix") String phonePrefix,
-	                                                       Pageable pageable);
+	@Query("SELECT c FROM Customer c WHERE LOWER(c.name) LIKE LOWER(CONCAT(:namePrefix, '%')) " +
+		       "OR LOWER(c.email) LIKE LOWER(CONCAT(:emailPrefix, '%')) " +
+		       "OR c.phone LIKE CONCAT(:phonePrefix, '%')")
+		Page<Customer> findAllCustomersByNameOrEmailOrPhone(@Param("namePrefix") String namePrefix,
+		                                                  @Param("emailPrefix") String emailPrefix,
+		                                                  @Param("phonePrefix") String phonePrefix,
+		                                                  Pageable pageable);
 
 }

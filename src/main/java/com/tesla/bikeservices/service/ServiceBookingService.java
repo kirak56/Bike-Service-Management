@@ -27,15 +27,15 @@ import jakarta.persistence.EntityNotFoundException;
 public class ServiceBookingService {
 
 	@Autowired
-	private ServiceBookingRepository serviceBookingRepository;
+	public ServiceBookingRepository serviceBookingRepository;
 	@Autowired
-	private CustomerRepository customerRepository;
+	public CustomerRepository customerRepository;
 	@Autowired
-	private ServiceTypeRepository serviceTypeRepository;
+	public ServiceTypeRepository serviceTypeRepository;
 	@Autowired
-	private SparePartRepository sparePartRepository;
+	public SparePartRepository sparePartRepository;
 	@Autowired
-	private AppointmentSlotRepository appointmentSlotRepository;
+	public AppointmentSlotRepository appointmentSlotRepository;
 
 	public ServiceBooking createBooking(ServiceBookingDTO bookingDTO) {
 		Customer customer = customerRepository.findById(bookingDTO.getCustomerId()).

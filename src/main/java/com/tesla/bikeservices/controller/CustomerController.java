@@ -30,6 +30,7 @@ public class CustomerController {
 	@PostMapping
     public ResponseEntity<Customer> createCustomer(@Valid @RequestBody Customer  customer) {
 
+		//return ResponseEntity.status(HttpStatus.CREATED).body(customerService.createCustomer(customer));
 		return ResponseEntity.ok(customerService.createCustomer(customer));
     }
 	
@@ -65,7 +66,7 @@ public class CustomerController {
             @RequestParam(defaultValue = "10") int size)
 	{
 		Pageable pageable = PageRequest.of(page, size); 
-        Page<Customer> customers = customerService.getAllCustomers(namePrefix, emailPrefix, phonePrefix, pageable);
+        Page<Customer> customers = customerService.findAllCustomersByNameOrEmailOrPhone(namePrefix, emailPrefix, phonePrefix, pageable);
         return ResponseEntity.ok(customers);
 		
     }

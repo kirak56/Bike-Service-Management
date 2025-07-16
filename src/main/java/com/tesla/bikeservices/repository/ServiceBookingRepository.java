@@ -16,11 +16,10 @@ public interface ServiceBookingRepository extends JpaRepository<ServiceBooking, 
     
  // Search bookings by status, technician, customer.name, or customer.email with pagination
     @Query("SELECT b FROM ServiceBooking b WHERE " +
-           "(:status IS NULL OR b.status = :status) " +
-           "OR (:technicianPrefix IS NULL OR LOWER(b.technician) LIKE LOWER(CONCAT(:technicianPrefix, '%'))) " +
-           "OR (:customerPrefix IS NULL OR " +
-           "LOWER(b.customer.name) LIKE LOWER(CONCAT(:customerPrefix, '%')) OR " +
-           "LOWER(b.customer.email) LIKE LOWER(CONCAT(:customerPrefix, '%')))")
+    	       "(b.status = :status) OR " +
+    	       "(LOWER(b.technician) LIKE LOWER(CONCAT(:technicianPrefix, '%'))) OR " +
+    	       "(LOWER(b.customer.name) LIKE LOWER(CONCAT(:customerPrefix, '%')) OR " +
+    	       "LOWER(b.customer.email) LIKE LOWER(CONCAT(:customerPrefix, '%')))")
     Page<ServiceBooking> findByStatusOrTechnicianOrCustomerNameOrEmail(
             @Param("status") String status,
             @Param("technicianPrefix") String technicianPrefix,
