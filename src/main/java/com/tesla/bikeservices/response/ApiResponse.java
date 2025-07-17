@@ -35,6 +35,8 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> error(String message, Map<String, String> errors) {
         return new ApiResponse<>("error", message, null, errors, null);
     }
+    
+    
 
     @Data
     public static class Pagination {

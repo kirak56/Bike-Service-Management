@@ -1,7 +1,10 @@
 package com.tesla.bikeservices.service;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.tesla.bikeservices.entity.Customer;
@@ -18,9 +21,10 @@ public class CustomerService {
         this.customerRepository = customerRepository;
     }
 
- 
-    public Customer createCustomer(Customer customer) {
-        return customerRepository.save(customer);
+    @Async 
+    public CompletableFuture<Customer> createCustomer(Customer customer) {
+    	Customer savedCustomer = customerRepository.save(customer);
+        return CompletableFuture.completedFuture(savedCustomer);
     }
 
     public Customer getCustomer(Long id) {
@@ -44,9 +48,10 @@ public class CustomerService {
         findCustomerOrThrow(id);
         customerRepository.deleteById(id);
     }
-
-    public Page<Customer> findAllCustomersByNameOrEmailOrPhone(String namePrefix, String emailPrefix, String phonePrefix, Pageable pageable) {
-        return customerRepository.findAllCustomersByNameOrEmailOrPhone(namePrefix, emailPrefix, phonePrefix, pageable);
+    @Async
+    public CompletableFuture<Page<Customer>> findAllCustomersByNameOrEmailOrPhone(String namePrefix, String emailPrefix, String phonePrefix, Pageable pageable) {
+    	Page<Customer> customers = customerRepository.findAllCustomersByNameOrEmailOrPhone(namePrefix, emailPrefix, phonePrefix, pageable);
+    	return CompletableFuture.completedFuture(customers);
     }
 
     private Customer findCustomerOrThrow(Long id) {

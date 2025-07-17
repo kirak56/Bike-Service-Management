@@ -1,5 +1,7 @@
 package com.tesla.bikeservices.controller;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,10 +34,10 @@ public class CustomerController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Customer>> createCustomer(@Valid @RequestBody Customer customer) {
-        Customer savedCustomer = customerService.createCustomer(customer);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Customer created successfully", savedCustomer));
+    public CompletableFuture<ResponseEntity<ApiResponse<Customer>>> createCustomer(@Valid @RequestBody Customer customer) {
+        return customerService.createCustomer(customer).thenApply(savedCustomer ->
+        ResponseEntity.status(HttpStatus.CREATED)
+        .body(ApiResponse.success("Customer created successfully", savedCustomer)));
     }
 
     @GetMapping("/{id}")
@@ -68,7 +70,7 @@ public class CustomerController {
     }
 
     @GetMapping("/search-by-criteria")
-    public ResponseEntity<ApiResponse<Page<Customer>>> fetchCustomersByCriteria(
+    public CompletableFuture<ResponseEntity<ApiResponse<Page<Customer>>>> fetchCustomersByCriteria(
             @RequestParam(required = false) String namePrefix,
             @RequestParam(required = false) String emailPrefix,
             @RequestParam(required = false) String phonePrefix,
@@ -78,9 +80,13 @@ public class CustomerController {
         String sanitizedEmail = emailPrefix != null ? emailPrefix.trim() : null;
         String sanitizedPhone = phonePrefix != null ? phonePrefix.trim() : null;
         Pageable pageable = PageRequest.of(page, size);
-        Page<Customer> customers = customerService.findAllCustomersByNameOrEmailOrPhone(
-                sanitizedName, sanitizedEmail, sanitizedPhone, pageable);
-        ApiResponse.Pagination pagination = new ApiResponse.Pagination(page, size, customers.getTotalElements(), customers.getTotalPages());
-        return ResponseEntity.ok(ApiResponse.successPaginated("Customers retrieved successfully", customers, pagination));
-    }
+        
+       return customerService.findAllCustomersByNameOrEmailOrPhone(sanitizedName, sanitizedEmail, sanitizedPhone, pageable)
+               .thenApply(customers -> {
+                   ApiResponse.Pagination pagination = new ApiResponse.Pagination(
+                           page, size, customers.getTotalElements(), customers.getTotalPages());
+                   return ResponseEntity.ok(ApiResponse.successPaginated("Customers retrieved successfully", customers, pagination));
+               });
+               
+   }
 }
