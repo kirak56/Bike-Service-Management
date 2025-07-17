@@ -20,7 +20,7 @@ public interface ServiceBookingRepository extends JpaRepository<ServiceBooking, 
     	       "(LOWER(b.technician) LIKE LOWER(CONCAT(:technicianPrefix, '%'))) OR " +
     	       "(LOWER(b.customer.name) LIKE LOWER(CONCAT(:customerPrefix, '%')) OR " +
     	       "LOWER(b.customer.email) LIKE LOWER(CONCAT(:customerPrefix, '%')))")
-    Page<ServiceBooking> findByStatusOrTechnicianOrCustomerNameOrEmail(
+    Page<ServiceBooking> findByCriteria(
             @Param("status") String status,
             @Param("technicianPrefix") String technicianPrefix,
             @Param("customerPrefix") String customerPrefix,

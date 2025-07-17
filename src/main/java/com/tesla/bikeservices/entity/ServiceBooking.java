@@ -14,51 +14,55 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Version;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Entity
 @Data
 public class ServiceBooking {
-	
-	/*
-	 * service booking entity
-	 */
-	@GeneratedValue(strategy = GenerationType.AUTO)
 
-	@Id
-	private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "customer_id")
-	private Customer customer;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "service_type_id")
-	private ServiceType serviceType;
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
-	@OneToOne
-	@JoinColumn(name = "appointment_slot_id")
-	private AppointmentSlot appointmentSlot;
+    @ManyToOne
+    @JoinColumn(name = "service_type_id")
+    private ServiceType serviceType;
 
-	@NotBlank(message = "Status is mandatory")
-	private String status;
+    @OneToOne
+    @JoinColumn(name = "appointment_slot_id")
+    private AppointmentSlot appointmentSlot;
 
-	private String priority; // LOW, personally, I would use an enum for this
+    @NotBlank(message = "Status is mandatory")
+    private String status;
 
-	private LocalDateTime actualStartTime;
+    private String priority;
 
-	private LocalDateTime actualEndTime;
+    private LocalDateTime actualStartTime;
 
-	private String technician;
+    private LocalDateTime actualEndTime;
 
-	@ElementCollection
-	private List<String> statusHistory = new ArrayList<>();
-	@ManyToMany
-	@JoinTable(name = "booking_spare_parts", joinColumns = @JoinColumn(name = "booking_id"), inverseJoinColumns = @JoinColumn(name = "spare_part_id"))
+    private String technician;
 
-	private List<SparePart> spareParts = new ArrayList<>();
+    @ElementCollection
+    private List<String> statusHistory = new ArrayList<>();
 
-	private String notes;
-	private LocalDateTime createdAt = LocalDateTime.now();
+    @ManyToMany
+    @JoinTable(name = "booking_spare_parts",
+            joinColumns = @JoinColumn(name = "booking_id"),
+            inverseJoinColumns = @JoinColumn(name = "spare_part_id"))
+    private List<SparePart> spareParts = new ArrayList<>();
+
+    private String notes;
+
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Version
+    private Long version;
 }

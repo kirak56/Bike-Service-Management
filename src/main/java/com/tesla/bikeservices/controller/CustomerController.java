@@ -1,11 +1,9 @@
 package com.tesla.bikeservices.controller;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,57 +16,71 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tesla.bikeservices.entity.Customer;
+import com.tesla.bikeservices.response.ApiResponse;
 import com.tesla.bikeservices.service.CustomerService;
 
 import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/customers")
 public class CustomerController {
-	@Autowired
-    private CustomerService customerService;
-	
-	@PostMapping
-    public ResponseEntity<Customer> createCustomer(@Valid @RequestBody Customer  customer) {
 
-		//return ResponseEntity.status(HttpStatus.CREATED).body(customerService.createCustomer(customer));
-		return ResponseEntity.ok(customerService.createCustomer(customer));
+    private final CustomerService customerService;
+
+    public CustomerController(CustomerService customerService) {
+        this.customerService = customerService;
     }
-	
-	@GetMapping("/{id}")
-    public ResponseEntity<Customer> getCustomer(@PathVariable Long id) {
-        return ResponseEntity.ok(customerService.getCustomer(id));
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<Customer>> createCustomer(@Valid @RequestBody Customer customer) {
+        Customer savedCustomer = customerService.createCustomer(customer);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Customer created successfully", savedCustomer));
     }
-	
-	@GetMapping
-    public ResponseEntity<List<Customer>> getAllCustomers() {
-        return ResponseEntity.ok(customerService.getAllCustomers());
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<Customer>> getCustomer(@PathVariable Long id) {
+        Customer customer = customerService.getCustomer(id);
+        return ResponseEntity.ok(ApiResponse.success("Customer retrieved successfully", customer));
     }
-	
-	@PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, @Valid @RequestBody Customer customer) {
-		
-        return ResponseEntity.ok(customerService.updateCustomer(id, customer));
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<Page<Customer>>> getAllCustomers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Customer> customers = customerService.getAllCustomers(pageable);
+        ApiResponse.Pagination pagination = new ApiResponse.Pagination(page, size, customers.getTotalElements(), customers.getTotalPages());
+        return ResponseEntity.ok(ApiResponse.successPaginated("Customers retrieved successfully", customers, pagination));
     }
-	
-	@DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<Customer>> updateCustomer(@PathVariable Long id, @Valid @RequestBody Customer customer) {
+        Customer updatedCustomer = customerService.updateCustomer(id, customer);
+        return ResponseEntity.ok(ApiResponse.success("Customer updated successfully", updatedCustomer));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteCustomer(@PathVariable Long id) {
         customerService.deleteCustomer(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(ApiResponse.success("Customer deleted successfully", null));
     }
-	
-	
-	@GetMapping("/search-by-criteria")
-    public ResponseEntity<Page<Customer>> fetchCustomersByCriteria(
+
+    @GetMapping("/search-by-criteria")
+    public ResponseEntity<ApiResponse<Page<Customer>>> fetchCustomersByCriteria(
             @RequestParam(required = false) String namePrefix,
             @RequestParam(required = false) String emailPrefix,
             @RequestParam(required = false) String phonePrefix,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size)
-	{
-		Pageable pageable = PageRequest.of(page, size); 
-        Page<Customer> customers = customerService.findAllCustomersByNameOrEmailOrPhone(namePrefix, emailPrefix, phonePrefix, pageable);
-        return ResponseEntity.ok(customers);
-		
+            @RequestParam(defaultValue = "10") int size) {
+        String sanitizedName = namePrefix != null ? namePrefix.trim() : null;
+        String sanitizedEmail = emailPrefix != null ? emailPrefix.trim() : null;
+        String sanitizedPhone = phonePrefix != null ? phonePrefix.trim() : null;
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Customer> customers = customerService.findAllCustomersByNameOrEmailOrPhone(
+                sanitizedName, sanitizedEmail, sanitizedPhone, pageable);
+        ApiResponse.Pagination pagination = new ApiResponse.Pagination(page, size, customers.getTotalElements(), customers.getTotalPages());
+        return ResponseEntity.ok(ApiResponse.successPaginated("Customers retrieved successfully", customers, pagination));
     }
-	
 }
